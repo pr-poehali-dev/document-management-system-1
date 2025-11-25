@@ -70,14 +70,33 @@ export default function Index() {
                          doc.number.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          doc.correspondent.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesFilter = filterStatus === 'all' || doc.status === filterStatus;
-    return matchesSearch && matchesFilter;
+    
+    let matchesSection = true;
+    if (selectedSection === 'incoming') matchesSection = doc.type === 'incoming';
+    else if (selectedSection === 'outgoing') matchesSection = doc.type === 'outgoing';
+    else if (selectedSection === 'internal') matchesSection = doc.type === 'internal';
+    else if (selectedSection === 'approval') matchesSection = doc.status === 'approval';
+    else if (selectedSection === 'archive') matchesSection = doc.status === 'archived';
+    
+    return matchesSearch && matchesFilter && matchesSection;
   });
 
+  const getSectionDocuments = () => {
+    if (selectedSection === 'incoming') return mockDocuments.filter(d => d.type === 'incoming');
+    if (selectedSection === 'outgoing') return mockDocuments.filter(d => d.type === 'outgoing');
+    if (selectedSection === 'internal') return mockDocuments.filter(d => d.type === 'internal');
+    if (selectedSection === 'approval') return mockDocuments.filter(d => d.status === 'approval');
+    if (selectedSection === 'archive') return mockDocuments.filter(d => d.status === 'archived');
+    return mockDocuments;
+  };
+
+  const sectionDocs = getSectionDocuments();
+  
   const stats = {
-    total: mockDocuments.length,
-    new: mockDocuments.filter(d => d.status === 'new').length,
-    processing: mockDocuments.filter(d => d.status === 'processing').length,
-    approval: mockDocuments.filter(d => d.status === 'approval').length,
+    total: sectionDocs.length,
+    new: sectionDocs.filter(d => d.status === 'new').length,
+    processing: sectionDocs.filter(d => d.status === 'processing').length,
+    approval: sectionDocs.filter(d => d.status === 'approval').length,
   };
 
   return (
